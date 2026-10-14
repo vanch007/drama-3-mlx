@@ -903,6 +903,7 @@ class DownsampleResidualVectorQuantize(nn.Module):
         )
 
     def decode(self, indices: mx.array) -> mx.array:
+        indices = indices.astype(mx.int32)
         new_indices = mx.zeros_like(indices)
         new_indices[:, 0] = mx.clip(
             indices[:, 0], a_min=0, a_max=self.semantic_quantizer.codebook_size - 1
@@ -1177,6 +1178,7 @@ class DAC(nn.Module):
     def decode(self, indices: mx.array, feature_lengths: mx.array):
         if indices.ndim == 2:
             indices = indices[None]
+        indices = indices.astype(mx.int32)
         z = self.quantizer.decode(indices)
         audio_lengths = feature_lengths * self.frame_length
         return self.decoder(z), audio_lengths

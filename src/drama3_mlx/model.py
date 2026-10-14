@@ -36,7 +36,9 @@ def map_tower_key(k: str) -> str:
 
 def map_backbone_key(k: str) -> str:
     if k.startswith("model.language_model."):
-        return k[len("model.language_model.") :]
+        k = k[len("model.language_model.") :]
+    if ".linear_attn.conv1d.weight" in k:
+        k = k.replace(".linear_attn.conv1d.weight", ".linear_attn.conv1d_weight")
     return k
 
 
@@ -139,7 +141,9 @@ class Drama3Model(nn.Module):
             codes_input = codes
 
         feature_lengths = mx.array([codes_input.shape[-1]], dtype=mx.int32)
-        audio, _ = self.codec.decode(codes_input, feature_lengths)
+        audio, lengths = self.codec.decode(codes_input, feature_lengths)
+        length = int(lengths[0].item())
+        audio = audio[..., :length]
         audio_np = np.array(audio.squeeze())
         return audio_np
 

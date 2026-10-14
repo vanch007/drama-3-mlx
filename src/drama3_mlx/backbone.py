@@ -56,11 +56,13 @@ class FishOmniBackbone(nn.Module):
     def _init_rope_table(self, max_seq_len: int) -> None:
         dim = self.config.rotary_dim
         base = self.config.rope_theta
-        inv_freq = 1.0 / (base ** (mx.arange(0, dim, 2, dtype=mx.float32) / dim))
+        exponents = mx.arange(0, dim, 2, dtype=mx.float32)
+        inv_freq = 1.0 / (base ** (exponents / dim))
         t = mx.arange(max_seq_len, dtype=mx.float32)
-        freqs = mx.outer(t, inv_freq)
-        self._cos_table = mx.cos(freqs)
-        self._sin_table = mx.sin(freqs)
+        angles = mx.outer(t, inv_freq)
+        angles = mx.concatenate([angles, angles], axis=-1)
+        self._cos_table = mx.cos(angles)
+        self._sin_table = mx.sin(angles)
 
     def allocate_caches(self, batch_size: int, max_seq_len: int) -> None:
         for layer in self.layers:
@@ -73,7 +75,7 @@ class FishOmniBackbone(nn.Module):
         return self.embed_tokens(token_ids)
 
     def compute_logits(self, hidden_states: mx.array) -> mx.array:
-        return self.lm_head(self.norm(hidden_states))
+        return self.lm_head(hidden_states)
 
     def __call__(
         self,
@@ -116,4 +118,4 @@ class FishOmniBackbone(nn.Module):
         for layer in self.layers:
             x = layer(x, context)
 
-        return x
+        return self.norm(x)

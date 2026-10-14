@@ -18,44 +18,37 @@ MIN_TEMPERATURE = 1e-5
 
 def sample_top_k_top_p(
     logits: mx.array,
-    temperature: float = 1.0,
+    temperature: float = 0.7,
     top_k: int = 30,
-    top_p: float = 0.95,
+    top_p: float = 0.7,
 ) -> mx.array:
-    """Sample one token index per row with top-k and top-p (nucleus) filtering.
+    """Sample one token index per row with official Gumbel-max and top-k/top-p filtering.
     logits: [batch, vocab_size] -> returns [batch]
     """
     temp = max(temperature, MIN_TEMPERATURE)
-    scaled_logits = logits.astype(mx.float32) / temp
+    scaled = logits.astype(mx.float32) / temp
 
-    if top_k <= 1:
-        return mx.argmax(scaled_logits, axis=-1)
-
-    # Sort descending
-    vocab_size = scaled_logits.shape[-1]
+    vocab_size = scaled.shape[-1]
     top_k = min(top_k, vocab_size)
 
-    indices = mx.argsort(-scaled_logits, axis=-1)
-    sorted_logits = mx.take_along_axis(scaled_logits, indices, axis=-1)
+    indices = mx.argsort(-scaled, axis=-1)
+    values = mx.take_along_axis(scaled, indices, axis=-1)
 
-    probs = mx.softmax(sorted_logits, axis=-1)
+    probs = mx.softmax(values, axis=-1)
     cum_probs = mx.cumsum(probs, axis=-1)
 
-    # Top-p thresholding: mask items whose cumulative probability exceeded top_p
-    # Keep at least the first item
-    mask = (cum_probs > top_p)
-    mask = mx.concatenate([mx.zeros((mask.shape[0], 1), dtype=mx.bool_), mask[:, :-1]], axis=-1)
+    ranks = mx.arange(vocab_size)[None, :]
+    dropped = (cum_probs > top_p) | (ranks >= top_k)
+    # Never drop the top-ranked token
+    dropped = mx.concatenate([mx.zeros((dropped.shape[0], 1), dtype=mx.bool_), dropped[:, 1:]], axis=-1)
 
-    if top_k < vocab_size:
-        rank_mask = mx.arange(vocab_size)[None, :] >= top_k
-        mask = mask | rank_mask
+    probabilities = mx.softmax(mx.where(dropped, -1e9, values), axis=-1)
 
-    filtered_logits = mx.where(mask, -1e9, sorted_logits)
-    filtered_probs = mx.softmax(filtered_logits, axis=-1)
-
-    sampled_sorted_idx = mx.random.categorical(mx.log(filtered_probs + 1e-10))
-    sampled_orig_idx = mx.take_along_axis(indices, sampled_sorted_idx[:, None], axis=-1).squeeze(-1)
-    return sampled_orig_idx
+    # Gumbel-max sampling with exponential noise: noise ~ Exp(1) = -log(U(0, 1))
+    u = mx.clip(mx.random.uniform(shape=probabilities.shape), 1e-7, 1.0)
+    noise = -mx.log(u)
+    choice = mx.argmax(probabilities / noise, axis=-1, keepdims=True)
+    return mx.take_along_axis(indices, choice, axis=-1).squeeze(-1)
 
 
 class TowerAttention(nn.Module):
