@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drama3-mlx"
+version = "0.1.0"
+description = "Pure MLX implementation of Fish Audio Drama 3 for Apple Silicon"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "vanch" }
+]
+keywords = [
+    "mlx",
+    "apple-silicon",
+    "tts",
+    "speech-synthesis",
+    "voice-cloning",
+    "drama3",
+    "fish-audio"
+]
+dependencies = [
+    "mlx>=0.30.0",
+    "numpy>=1.24.0",
+    "soundfile>=0.12.1",
+    "tokenizers>=0.19.0",
+    "safetensors>=0.4.0",
+    "tqdm>=4.65.0"
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0"
+]
+convert = [
+    "torch>=2.2.0",
+    "huggingface-hub>=0.20.0"
+]
+all = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "torch>=2.2.0",
+    "huggingface-hub>=0.20.0",
+    "scipy>=1.10.0",
+    "librosa>=0.10.0"
+]
+test = [
+    "pytest>=7.0.0"
+]
+
+[project.scripts]
+drama3-mlx = "drama3_mlx.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
