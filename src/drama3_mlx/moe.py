@@ -70,21 +70,27 @@ class MoEExperts(nn.Module):
     def _is_quantized(self) -> bool:
         return self.w13_scales is not None and self.w13_scales.size > 0
 
+    def _get_bits(self) -> int:
+        if self.w13_weight.dtype == mx.uint32:
+            return 32 // (self.hidden // self.w13_weight.shape[-1])
+        return 16
+
     def _get_expert_weights(self, idx: int) -> Tuple[mx.array, mx.array]:
         if self._is_quantized():
+            bits = self._get_bits()
             w13 = mx.dequantize(
                 self.w13_weight[idx],
                 self.w13_scales[idx],
                 self.w13_biases[idx],
                 group_size=self.group_size,
-                bits=self.bits,
+                bits=bits,
             )
             w2 = mx.dequantize(
                 self.w2_weight[idx],
                 self.w2_scales[idx],
                 self.w2_biases[idx],
                 group_size=self.group_size,
-                bits=self.bits,
+                bits=bits,
             )
             return w13, w2
         return self.w13_weight[idx], self.w2_weight[idx]

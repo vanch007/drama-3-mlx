@@ -123,9 +123,10 @@ def convert_drama3_model(
             w13_stacked = mx.array(np.stack(w13_list, axis=0)).astype(mx.bfloat16)
             w2_stacked = mx.array(np.stack(w2_list, axis=0)).astype(mx.bfloat16)
 
-            if quantize == "8bit":
-                qw13, s13, b13 = mx.quantize(w13_stacked, group_size=64, bits=8)
-                qw2, s2, b2 = mx.quantize(w2_stacked, group_size=64, bits=8)
+            if quantize in ("8bit", "4bit"):
+                bits = 4 if quantize == "4bit" else 8
+                qw13, s13, b13 = mx.quantize(w13_stacked, group_size=64, bits=bits)
+                qw2, s2, b2 = mx.quantize(w2_stacked, group_size=64, bits=bits)
                 shard_weights[f"model.language_model.layers.{layer}.mlp.experts.w13_weight"] = qw13
                 shard_weights[f"model.language_model.layers.{layer}.mlp.experts.w13_scales"] = s13
                 shard_weights[f"model.language_model.layers.{layer}.mlp.experts.w13_biases"] = b13
@@ -170,7 +171,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", "-c", default="/Users/vanch/drama-3-mlx/checkpoints/drama-3", help="Input directory")
     parser.add_argument("--output", "-o", default="/Users/vanch/drama-3-mlx/models/drama-3-mlx", help="Output directory")
     parser.add_argument("--dtype", default="bfloat16", choices=["bfloat16", "float16"])
-    parser.add_argument("--quantize", default="8bit", choices=["8bit", "none"])
+    parser.add_argument("--quantize", default="8bit", choices=["8bit", "4bit", "none"])
     args = parser.parse_args()
 
     convert_drama3_model(args.checkpoint, args.output, dtype=args.dtype, quantize=args.quantize)
