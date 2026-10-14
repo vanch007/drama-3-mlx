@@ -268,6 +268,54 @@ class FishOmniAudioDecoder(nn.Module):
         for layer, code in zip(self.residual_layers, next_frames[:, 1:].T):
             hidden = layer(hidden, code, semantic, positions)
 
+    def init_candidates(self) -> None:
+        if self._main_candidates is None:
+            eos = mx.array([self.eos_id], dtype=mx.int32)
+            band = mx.arange(self.semantic_begin, self.semantic_end + 1, dtype=mx.int32)
+            candidates = mx.concatenate([eos, band])
+            self._main_candidates = candidates[mx.argsort(candidates)]
+
+    def decode_step_fast(
+        self,
+        candidate_logits: mx.array,
+        hidden: mx.array,
+        positions: mx.array,
+        frames: mx.array,
+        history: mx.array,
+        temperature: float = 0.7,
+        top_k: int = 30,
+        top_p: float = 0.7,
+    ) -> mx.array:
+        self.init_candidates()
+        candidates = self._main_candidates
+
+        first_idx = sample_top_k_top_p(candidate_logits, temperature, top_k, top_p)
+        first = candidates[first_idx]
+
+        retry_idx = sample_top_k_top_p(
+            candidate_logits, RAS_TEMPERATURE, RAS_TOP_K, RAS_TOP_P
+        )
+        retry = candidates[retry_idx]
+
+        recent_history = history[-RAS_WINDOW_FRAMES:]
+        repeated = mx.any(recent_history == first[:, None], axis=-1)
+        repeated = repeated & self.is_semantic(first)
+
+        main = mx.where(repeated, retry, first)
+        c0 = mx.clip(main - self.semantic_begin, 0, self.config.vocab_size - 1)
+        semantic = self.is_semantic(main)
+
+        hidden = self.run_shared(hidden, c0, semantic, positions, frames)
+
+        codes = [c0]
+        for layer, head in zip(self.residual_layers, self.codebook_heads):
+            hidden = layer(hidden, codes[-1], semantic, positions)
+            code_logits = head(hidden)
+            next_code = sample_top_k_top_p(code_logits, temperature, top_k, top_p)
+            codes.append(next_code)
+
+        return mx.stack([main, *codes], axis=-1)
+
     def decode_step(
         self,
         logits: mx.array,

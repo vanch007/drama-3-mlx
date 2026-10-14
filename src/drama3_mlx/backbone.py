@@ -77,6 +77,15 @@ class FishOmniBackbone(nn.Module):
     def compute_logits(self, hidden_states: mx.array) -> mx.array:
         return self.lm_head(hidden_states)
 
+    def init_candidate_weights(self, candidate_indices: mx.array) -> None:
+        self._candidate_indices = candidate_indices
+        self._candidate_weights = self.lm_head.weight[candidate_indices]
+
+    def compute_candidate_logits(self, hidden_states: mx.array) -> mx.array:
+        if not hasattr(self, "_candidate_weights") or self._candidate_weights is None:
+            return self.compute_logits(hidden_states)
+        return mx.matmul(hidden_states, self._candidate_weights.T)
+
     def __call__(
         self,
         input_ids: Optional[mx.array] = None,

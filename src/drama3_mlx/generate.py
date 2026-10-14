@@ -70,13 +70,16 @@ def generate_drama3(
     produced = 0
     finish_reason = "length"
 
+    tower.init_candidates()
+    backbone.init_candidate_weights(tower._main_candidates)
+
     # 2. Generation Loop
     for step in range(max_new_tokens):
         pos = prompt_rows - 1 + step
-        logits = backbone.compute_logits(hidden)
+        cand_logits = backbone.compute_candidate_logits(hidden)
 
-        sampled = tower.decode_step(
-            logits,
+        sampled = tower.decode_step_fast(
+            cand_logits,
             hidden,
             positions[pos : pos + 1],
             frames[pos : pos + 1],
@@ -158,11 +161,14 @@ def generate_drama3_stream(
     hidden = hidden[-1:]
     buffer_frames = []
 
+    tower.init_candidates()
+    backbone.init_candidate_weights(tower._main_candidates)
+
     for step in range(max_new_tokens):
         pos = prompt_rows - 1 + step
-        logits = backbone.compute_logits(hidden)
-        sampled = tower.decode_step(
-            logits,
+        cand_logits = backbone.compute_candidate_logits(hidden)
+        sampled = tower.decode_step_fast(
+            cand_logits,
             hidden,
             positions[pos : pos + 1],
             frames[pos : pos + 1],
