@@ -211,6 +211,7 @@ def generate_long_speech(
     temperature: float = 1.0,
     top_k: int = 30,
     top_p: float = 0.95,
+    max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS,
 ) -> np.ndarray:
     """Split long text into sentence/speaker chunks and synthesize sequentially."""
     chunks = split_drama3_text(text)
@@ -236,6 +237,7 @@ def generate_long_speech(
         codes, _ = generate_drama3(
             model,
             prompt,
+            max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,

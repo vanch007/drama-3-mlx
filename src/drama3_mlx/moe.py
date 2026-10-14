@@ -37,9 +37,8 @@ class DenseMLP(nn.Module):
 
 
 class MoEExperts(nn.Module):
-    """Routed experts stacked per layer:
-    w13_weight: [E, 2*I, H] (gate then up stacked on dim 1)
-    w2_weight:  [E, H, I]   (down proj, transposed for MLX Linear: x @ w2_weight.T or batch matmul)
+    """Routed experts stacked per layer.
+    Seamlessly supports both unquantized (BF16/FP16) and affine quantized (8-bit / 4-bit).
     """
 
     def __init__(
@@ -55,9 +54,40 @@ class MoEExperts(nn.Module):
         self.intermediate = intermediate
         self.dtype = dtype
 
-        # w13: [E, 2*I, H], w2: [E, H, I]
+        self.group_size = 64
+        self.bits = 8
+
+        # Initialize unquantized placeholders (load_weights replaces them when loading quantized weights)
         self.w13_weight = mx.zeros((num_experts, 2 * intermediate, hidden), dtype=dtype)
         self.w2_weight = mx.zeros((num_experts, hidden, intermediate), dtype=dtype)
+
+        # Pre-register scales and biases buffers for quantized checkpoints
+        self.w13_scales = mx.zeros((0,), dtype=dtype)
+        self.w13_biases = mx.zeros((0,), dtype=dtype)
+        self.w2_scales = mx.zeros((0,), dtype=dtype)
+        self.w2_biases = mx.zeros((0,), dtype=dtype)
+
+    def _is_quantized(self) -> bool:
+        return self.w13_scales is not None and self.w13_scales.size > 0
+
+    def _get_expert_weights(self, idx: int) -> Tuple[mx.array, mx.array]:
+        if self._is_quantized():
+            w13 = mx.dequantize(
+                self.w13_weight[idx],
+                self.w13_scales[idx],
+                self.w13_biases[idx],
+                group_size=self.group_size,
+                bits=self.bits,
+            )
+            w2 = mx.dequantize(
+                self.w2_weight[idx],
+                self.w2_scales[idx],
+                self.w2_biases[idx],
+                group_size=self.group_size,
+                bits=self.bits,
+            )
+            return w13, w2
+        return self.w13_weight[idx], self.w2_weight[idx]
 
     def __call__(self, x: mx.array, topk_ids: mx.array, topk_weights: mx.array) -> mx.array:
         """x: [N, H], topk_ids: [N, k], topk_weights: [N, k] -> [N, H]."""
@@ -65,39 +95,49 @@ class MoEExperts(nn.Module):
         k = topk_ids.shape[1]
 
         if N == 1:
-            # Fast decode path for single token
-            token_x = x[0]  # [H]
-            ids = topk_ids[0]  # [k]
-            weights = topk_weights[0]  # [k]
+            token_x = x[0]
+            ids = topk_ids[0]
+            weights = topk_weights[0]
 
             out = mx.zeros((H,), dtype=x.dtype)
             for idx, w in zip(ids.tolist(), weights.tolist()):
-                w13 = self.w13_weight[idx]  # [2*I, H]
-                gate_up = mx.matmul(w13, token_x)  # [2*I]
+                w13, w2 = self._get_expert_weights(idx)
+                gate_up = mx.matmul(w13, token_x)
                 gate = gate_up[: self.intermediate]
                 up = gate_up[self.intermediate :]
-                act = nn.silu(gate) * up  # [I]
-                down = mx.matmul(self.w2_weight[idx], act)  # [H]
+                act = nn.silu(gate) * up
+                down = mx.matmul(w2, act)
                 out = out + (down * w)
             return out[None, :]
 
         # Batched / multi-token path
         out = mx.zeros((N, H), dtype=x.dtype)
-        for i in range(k):
-            expert_indices = topk_ids[:, i]  # [N]
-            weights = topk_weights[:, i : i + 1]  # [N, 1]
+        if self._is_quantized():
+            unique_indices = set(topk_ids.reshape(-1).tolist())
+            expert_cache = {idx: self._get_expert_weights(idx) for idx in unique_indices}
+            for i in range(k):
+                expert_indices = topk_ids[:, i].tolist()
+                weights = topk_weights[:, i : i + 1]
+                w13_batch = mx.stack([expert_cache[idx][0] for idx in expert_indices], axis=0)
+                w2_batch = mx.stack([expert_cache[idx][1] for idx in expert_indices], axis=0)
+                gate_up = mx.matmul(w13_batch, x[..., None]).squeeze(-1)
+                gate = gate_up[:, : self.intermediate]
+                up = gate_up[:, self.intermediate :]
+                act = nn.silu(gate) * up
+                down = mx.matmul(w2_batch, act[..., None]).squeeze(-1)
+                out = out + (down * weights)
+            return out
 
-            # Gather weights for each token's i-th expert: [N, 2*I, H]
+        for i in range(k):
+            expert_indices = topk_ids[:, i]
+            weights = topk_weights[:, i : i + 1]
             w13_batch = self.w13_weight[expert_indices]
             w2_batch = self.w2_weight[expert_indices]
-
-            # gate_up: [N, 2*I] = sum_H (x[N, 1, H] * w13_batch[N, 2*I, H])
-            gate_up = mx.matmul(w13_batch, x[..., None]).squeeze(-1)  # [N, 2*I]
+            gate_up = mx.matmul(w13_batch, x[..., None]).squeeze(-1)
             gate = gate_up[:, : self.intermediate]
             up = gate_up[:, self.intermediate :]
-            act = nn.silu(gate) * up  # [N, I]
-
-            down = mx.matmul(w2_batch, act[..., None]).squeeze(-1)  # [N, H]
+            act = nn.silu(gate) * up
+            down = mx.matmul(w2_batch, act[..., None]).squeeze(-1)
             out = out + (down * weights)
 
         return out

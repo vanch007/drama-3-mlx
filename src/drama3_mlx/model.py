@@ -22,6 +22,24 @@ from drama3_mlx.prompt import build_drama3_prompt
 from drama3_mlx.tower import FishOmniAudioDecoder
 
 
+def map_tower_key(k: str) -> str:
+    for prefix, repl in [
+        ("audio_decoder_mtp_shared.layers.", "shared_layers."),
+        ("audio_decoder_mtp.layers.", "residual_layers."),
+        ("audio_decoder_mtp.heads.", "codebook_heads."),
+        ("audio_decoder.codebook_embeddings.", "codebook_embeddings."),
+    ]:
+        if k.startswith(prefix):
+            return repl + k[len(prefix):]
+    return k
+
+
+def map_backbone_key(k: str) -> str:
+    if k.startswith("model.language_model."):
+        return k[len("model.language_model.") :]
+    return k
+
+
 class Drama3Model(nn.Module):
     """Unified pure MLX model for Fish Audio Drama 3.
     Combines text backbone, audio decoder tower, tokenizer, and DAC neural audio codec.
@@ -66,40 +84,33 @@ class Drama3Model(nn.Module):
 
         # 3. DAC Codec
         codec = build_ae()
-
-        # 4. Load weights
-        weight_files = list(model_dir.glob("*.safetensors"))
-        if not weight_files:
-            raise FileNotFoundError(f"No safetensors found in {model_dir}")
-
-        weights = {}
-        for wf in weight_files:
-            if wf.name == "codec.safetensors":
-                continue
-            loaded = mx.load(str(wf))
-            weights.update(loaded)
-
         codec_file = model_dir / "codec.safetensors"
         if codec_file.is_file():
             codec_weights = mx.load(str(codec_file))
-            codec.load_weights(list(codec_weights.items()))
+            codec.load_weights(list(codec_weights.items()), strict=False)
 
-        # Separate backbone and tower weights
-        backbone_weights = {}
-        tower_weights = {}
+        # 4. Stream load sharded weights into backbone and tower
+        weight_files = sorted(model_dir.glob("*.safetensors"))
+        if not weight_files:
+            raise FileNotFoundError(f"No safetensors found in {model_dir}")
 
-        for k, v in weights.items():
-            if k.startswith("model.language_model."):
-                backbone_weights[k[len("model.language_model.") :]] = v
-            elif k.startswith("audio_decoder_mtp_shared.") or k.startswith("audio_decoder_mtp.") or k.startswith("audio_decoder."):
-                tower_weights[k] = v
-            else:
-                backbone_weights[k] = v
+        for wf in weight_files:
+            if wf.name == "codec.safetensors":
+                continue
+            shard = mx.load(str(wf))
+            bb_weights = {}
+            tw_weights = {}
+            for k, v in shard.items():
+                if "audio_decoder" in k:
+                    tw_weights[map_tower_key(k)] = v
+                else:
+                    bb_weights[map_backbone_key(k)] = v
 
-        if backbone_weights:
-            backbone.load_weights(list(backbone_weights.items()), strict=False)
-        if tower_weights:
-            audio_decoder.load_weights(list(tower_weights.items()), strict=False)
+            if bb_weights:
+                backbone.load_weights(list(bb_weights.items()), strict=False)
+            if tw_weights:
+                audio_decoder.load_weights(list(tw_weights.items()), strict=False)
+            del shard, bb_weights, tw_weights
 
         return cls(config, backbone, audio_decoder, codec, tokenizer)
 
@@ -118,12 +129,12 @@ class Drama3Model(nn.Module):
 
         audio_tensor = mx.array(audio[None, None, :], dtype=mx.float32)
         codes, _ = self.codec.encode(audio_tensor)
-        return codes[0]  # [num_codebooks, num_frames]
+        return codes[0]
 
     def decode_codes_to_audio(self, codes: mx.array) -> np.ndarray:
         """Decode 10 codebooks [num_codebooks, num_frames] into 44.1kHz float32 audio."""
         if codes.ndim == 2:
-            codes_input = codes[None]  # [1, 10, T]
+            codes_input = codes[None]
         else:
             codes_input = codes
 
@@ -162,6 +173,7 @@ class Drama3Model(nn.Module):
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,
+            max_new_tokens=max_new_tokens,
         )
 
     def tts_stream(

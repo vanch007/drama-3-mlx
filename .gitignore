@@ -31,3 +31,4 @@ htmlcov/
 models/
 outputs/
 .DS_Store
+checkpoints/
