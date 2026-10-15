@@ -16,6 +16,13 @@ This repository provides an end-to-end, zero-PyTorch-at-runtime MLX port support
 
 ---
 
+## 🎧 Live Demo & Benchmark Showcase
+
+Experience the generated audio samples across 4-bit, 8-bit, and BF16 with zero-shot voice cloning, emotional point tags, and multi-speaker dialogues:
+👉 **[Online Interactive Audio Demo & Benchmark Report](https://vanch007.github.io/drama-3-mlx/)**
+
+---
+
 ## Architecture Overview
 
 1. **Text Backbone (`FishOmniBackbone`)**:
