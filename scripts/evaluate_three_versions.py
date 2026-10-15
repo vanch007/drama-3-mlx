@@ -33,7 +33,7 @@ TEST_CASES = [
         "ref_audio": str(_PROJECT_ROOT / "outputs/en0.wav"),
         "ref_text": "We asked over twenty different people, and they all said it was his.",
         "language": "en",
-        "max_new_tokens": 80,
+        "max_new_tokens": 250,
     },
     {
         "id": "case_02_zh_cloning",
@@ -43,7 +43,7 @@ TEST_CASES = [
         "ref_audio": "/Users/vanch/mlx-indextts2/outputs/fjymb_library_final/work/clips/0039_crosstalk_0120262-0122836.wav",
         "ref_text": "钱不多，干点好事儿，那倒是，万一我熬中了",
         "language": "zh",
-        "max_new_tokens": 80,
+        "max_new_tokens": 250,
     },
     {
         "id": "case_03_exact_replication",
@@ -53,7 +53,7 @@ TEST_CASES = [
         "ref_audio": str(_PROJECT_ROOT / "outputs/en0.wav"),
         "ref_text": "We asked over twenty different people, and they all said it was his.",
         "language": "en",
-        "max_new_tokens": 80,
+        "max_new_tokens": 250,
     },
     {
         "id": "case_04_point_tags_emotion",
@@ -63,7 +63,7 @@ TEST_CASES = [
         "ref_audio": str(_PROJECT_ROOT / "outputs/en0.wav"),
         "ref_text": "We asked over twenty different people, and they all said it was his.",
         "language": "en",
-        "max_new_tokens": 80,
+        "max_new_tokens": 250,
     },
     {
         "id": "case_05_multi_speaker",
@@ -73,7 +73,7 @@ TEST_CASES = [
         "ref_audio": None,
         "ref_text": None,
         "language": "zh",
-        "max_new_tokens": 80,
+        "max_new_tokens": 250,
     },
     {
         "id": "case_06_long_form",

@@ -27,10 +27,10 @@
       "variant": "4bit",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content.",
       "audio_file": "case_01_en_cloning_4bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 7.66,
       "elapsed_s": 20.574,
       "rtf": 5.538,
-      "asr_text": "Fish Audio Drama 3 is a next generation text-to-speech"
+      "asr_text": "FISH Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content."
     },
     {
       "case_id": "case_02_zh_cloning",
@@ -38,10 +38,10 @@
       "variant": "4bit",
       "target_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统，声音效果非常自然。",
       "audio_file": "case_02_zh_cloning_4bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 6.41,
       "elapsed_s": 14.039,
       "rtf": 3.779,
-      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama3语音和语音"
+      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统声音效果非常自然"
     },
     {
       "case_id": "case_03_exact_replication",
@@ -49,7 +49,7 @@
       "variant": "4bit",
       "target_text": "We asked over twenty different people, and they all said it was his.",
       "audio_file": "case_03_exact_replication_4bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 3.76,
       "elapsed_s": 14.471,
       "rtf": 3.895,
       "asr_text": "We asked over twenty different people, and they all said it was his."
@@ -60,10 +60,10 @@
       "variant": "4bit",
       "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
       "audio_file": "case_04_point_tags_emotion_4bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 11.61,
       "elapsed_s": 14.713,
       "rtf": 3.96,
-      "asr_text": "Sigh"
+      "asr_text": "Fine."
     },
     {
       "case_id": "case_05_multi_speaker",
@@ -71,7 +71,7 @@
       "variant": "4bit",
       "target_text": "<|speaker:0|> 晚上想吃什么？ <|speaker:1|> 随便，听你的就好。",
       "audio_file": "case_05_multi_speaker_4bit.wav",
-      "duration_s": 3.529,
+      "duration_s": 4.69,
       "elapsed_s": 10.291,
       "rtf": 2.916,
       "asr_text": "晚上想吃什么?随便,听你的就好。"
@@ -82,10 +82,10 @@
       "variant": "4bit",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content. It features a thirty-five billion parameter Mixture-of-Experts backbone with hybrid linear and full attention. With ten codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody.",
       "audio_file": "case_06_long_form_4bit.wav",
-      "duration_s": 21.734,
+      "duration_s": 23.82,
       "elapsed_s": 92.696,
       "rtf": 4.265,
-      "asr_text": "Fish Audio Drama 3 is a next generation text-to-speech model built for multi-character scenes and long-form content. It features a 35 billion parameter mixture of experts' backbone with high- With 10 codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody."
+      "asr_text": "FISH Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content. With 10 codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody."
     },
     {
       "case_id": "case_01_en_cloning",
