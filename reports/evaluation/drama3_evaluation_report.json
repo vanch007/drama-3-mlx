@@ -58,12 +58,12 @@
       "case_id": "case_04_point_tags_emotion",
       "category": "Point Tags & Emotion",
       "variant": "4bit",
-      "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
+      "target_text": "[sighs] Fine. If we miss it, it's on you. [laughs] Well, maybe that's fair.",
       "audio_file": "case_04_point_tags_emotion_4bit.wav",
-      "duration_s": 11.61,
-      "elapsed_s": 14.713,
-      "rtf": 3.96,
-      "asr_text": "Fine."
+      "duration_s": 5.9,
+      "elapsed_s": 20.54,
+      "rtf": 3.483,
+      "asr_text": "Fine. If we miss it, it's on you. Ha ha ha. Well, maybe that's fair."
     },
     {
       "case_id": "case_05_multi_speaker",
@@ -124,12 +124,12 @@
       "case_id": "case_04_point_tags_emotion",
       "category": "Point Tags & Emotion",
       "variant": "8bit",
-      "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
+      "target_text": "[sighs] Fine. If we miss it, it's on you. [laughs] Well, maybe that's fair.",
       "audio_file": "case_04_point_tags_emotion_8bit.wav",
-      "duration_s": 11.61,
-      "elapsed_s": 16.656,
-      "rtf": 4.483,
-      "asr_text": "Fine. If we miss it, it is on you."
+      "duration_s": 8.45,
+      "elapsed_s": 27.85,
+      "rtf": 3.295,
+      "asr_text": "Fine. If we miss it, it's on you. Well, maybe that's fair."
     },
     {
       "case_id": "case_05_multi_speaker",
@@ -190,12 +190,12 @@
       "case_id": "case_04_point_tags_emotion",
       "category": "Point Tags & Emotion",
       "variant": "bf16",
-      "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
+      "target_text": "[sighs] Fine. If we miss it, it's on you. [laughs] Well, maybe that's fair.",
       "audio_file": "case_04_point_tags_emotion_bf16.wav",
-      "duration_s": 10.22,
-      "elapsed_s": 19.233,
-      "rtf": 5.177,
-      "asr_text": "Fine. If we miss it, it is on you."
+      "duration_s": 7.24,
+      "elapsed_s": 40.87,
+      "rtf": 5.641,
+      "asr_text": "Fine. If we miss it, it's on you. Well, maybe that's fair."
     },
     {
       "case_id": "case_05_multi_speaker",
