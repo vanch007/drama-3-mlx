@@ -93,10 +93,10 @@
       "variant": "8bit",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content.",
       "audio_file": "case_01_en_cloning_8bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 7.43,
       "elapsed_s": 28.285,
       "rtf": 7.613,
-      "asr_text": "Fish Audio Drama 3 is a next generation text-to-speech"
+      "asr_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content."
     },
     {
       "case_id": "case_02_zh_cloning",
@@ -104,10 +104,10 @@
       "variant": "8bit",
       "target_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统，声音效果非常自然。",
       "audio_file": "case_02_zh_cloning_8bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 7.29,
       "elapsed_s": 15.208,
       "rtf": 4.093,
-      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统"
+      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统,声音效果非常自然。"
     },
     {
       "case_id": "case_03_exact_replication",
@@ -115,7 +115,7 @@
       "variant": "8bit",
       "target_text": "We asked over twenty different people, and they all said it was his.",
       "audio_file": "case_03_exact_replication_8bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 3.76,
       "elapsed_s": 16.289,
       "rtf": 4.384,
       "asr_text": "We asked over twenty different people, and they all said it was his."
@@ -126,7 +126,7 @@
       "variant": "8bit",
       "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
       "audio_file": "case_04_point_tags_emotion_8bit.wav",
-      "duration_s": 3.715,
+      "duration_s": 11.61,
       "elapsed_s": 16.656,
       "rtf": 4.483,
       "asr_text": "Fine. If we miss it, it is on you."
@@ -137,7 +137,7 @@
       "variant": "8bit",
       "target_text": "<|speaker:0|> 晚上想吃什么？ <|speaker:1|> 随便，听你的就好。",
       "audio_file": "case_05_multi_speaker_8bit.wav",
-      "duration_s": 3.251,
+      "duration_s": 4.32,
       "elapsed_s": 11.16,
       "rtf": 3.433,
       "asr_text": "晚上想吃什么?随便,听你的就好。"
@@ -148,7 +148,7 @@
       "variant": "8bit",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content. It features a thirty-five billion parameter Mixture-of-Experts backbone with hybrid linear and full attention. With ten codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody.",
       "audio_file": "case_06_long_form_8bit.wav",
-      "duration_s": 20.898,
+      "duration_s": 20.9,
       "elapsed_s": 100.714,
       "rtf": 4.819,
       "asr_text": "FISH Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content. It features a 35 billion parameter mixture of experts' backbone with hybrid linear and full attention. With 10 codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody."
@@ -159,10 +159,10 @@
       "variant": "bf16",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content.",
       "audio_file": "case_01_en_cloning_bf16.wav",
-      "duration_s": 3.715,
+      "duration_s": 7.15,
       "elapsed_s": 37.153,
       "rtf": 10.0,
-      "asr_text": "Fish Audio Drama 3 is a next generation text to speed."
+      "asr_text": "FISH Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content."
     },
     {
       "case_id": "case_02_zh_cloning",
@@ -170,10 +170,10 @@
       "variant": "bf16",
       "target_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统，声音效果非常自然。",
       "audio_file": "case_02_zh_cloning_bf16.wav",
-      "duration_s": 3.715,
+      "duration_s": 5.34,
       "elapsed_s": 17.517,
       "rtf": 4.715,
-      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama3语音合成系统"
+      "asr_text": "欢迎使用运行在苹果芯片上的全量Drama 3语音合成系统,声音效果非常自然。"
     },
     {
       "case_id": "case_03_exact_replication",
@@ -181,7 +181,7 @@
       "variant": "bf16",
       "target_text": "We asked over twenty different people, and they all said it was his.",
       "audio_file": "case_03_exact_replication_bf16.wav",
-      "duration_s": 3.715,
+      "duration_s": 3.72,
       "elapsed_s": 18.088,
       "rtf": 4.869,
       "asr_text": "We asked over 20 different people, and they all said it was his."
@@ -192,10 +192,10 @@
       "variant": "bf16",
       "target_text": "[sighs] Fine. If we miss it, it is on you. [laughs] Well, maybe that is fair.",
       "audio_file": "case_04_point_tags_emotion_bf16.wav",
-      "duration_s": 3.715,
+      "duration_s": 10.22,
       "elapsed_s": 19.233,
       "rtf": 5.177,
-      "asr_text": "Fine."
+      "asr_text": "Fine. If we miss it, it is on you."
     },
     {
       "case_id": "case_05_multi_speaker",
@@ -203,10 +203,10 @@
       "variant": "bf16",
       "target_text": "<|speaker:0|> 晚上想吃什么？ <|speaker:1|> 随便，听你的就好。",
       "audio_file": "case_05_multi_speaker_bf16.wav",
-      "duration_s": 3.715,
+      "duration_s": 4.13,
       "elapsed_s": 12.247,
       "rtf": 3.296,
-      "asr_text": "晚上想吃什么?随便"
+      "asr_text": "晚上想吃什么?随便,听你的就好。"
     },
     {
       "case_id": "case_06_long_form",
@@ -214,7 +214,7 @@
       "variant": "bf16",
       "target_text": "Fish Audio Drama 3 is a next-generation text-to-speech model built for multi-character scenes and long-form content. It features a thirty-five billion parameter Mixture-of-Experts backbone with hybrid linear and full attention. With ten codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody.",
       "audio_file": "case_06_long_form_bf16.wav",
-      "duration_s": 21.687,
+      "duration_s": 21.69,
       "elapsed_s": 106.683,
       "rtf": 4.919,
       "asr_text": "FISH Audio Drama 3 is a next generation text to speech model built for multi-character scenes and long form content. It features a 35 billion parameter mixture of expert's backbone with hybrid linear and full. With 10 codebooks decoded causally over the entire sequence, it achieves remarkable voice fidelity and expressive prosody."

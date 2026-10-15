@@ -56,6 +56,7 @@ def generate_drama3(
             use_cache=True,
             continue_state=start > 0,
         )[0]
+        mx.eval(hidden)
 
         paired_end = min(end, prompt_rows - 1)
         if paired_end > start:
@@ -106,6 +107,7 @@ def generate_drama3(
                 use_cache=True,
                 continue_state=True,
             )[0]
+            mx.eval(hidden)
 
     # Return codes: [num_codebooks, num_frames]
     gen_frames = frames[prompt_rows : prompt_rows + produced]
@@ -149,6 +151,7 @@ def generate_drama3_stream(
             use_cache=True,
             continue_state=start > 0,
         )[0]
+        mx.eval(hidden)
         paired_end = min(end, prompt_rows - 1)
         if paired_end > start:
             tower.prefill(
@@ -200,6 +203,7 @@ def generate_drama3_stream(
                 use_cache=True,
                 continue_state=True,
             )[0]
+            mx.eval(hidden)
 
     # Flush remainder
     if buffer_frames:
