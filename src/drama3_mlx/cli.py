@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import time
 from pathlib import Path
 
 import soundfile as sf
 
-from drama3_mlx.convert import convert_drama3_model
 from drama3_mlx.model import Drama3Model
 
 
@@ -37,9 +37,11 @@ def cmd_tts(args: argparse.Namespace) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     sf.write(str(out_path), audio, model.config.codec_sample_rate)
     print(f"Saved audio to {out_path} ({duration:.2f}s, elapsed: {elapsed:.2f}s, RTF: {rtf:.3f})")
+    print(json.dumps({"task": "tts", "elapsed_s": round(elapsed, 4), "duration_s": round(duration, 4), "real_time_factor": round(rtf, 4)}))
 
 
 def cmd_convert(args: argparse.Namespace) -> None:
+    from drama3_mlx.convert import convert_drama3_model
     convert_drama3_model(args.checkpoint, args.output, dtype=args.dtype)
 
 

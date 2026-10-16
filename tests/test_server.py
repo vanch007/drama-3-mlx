@@ -65,6 +65,8 @@ class TestServer(unittest.TestCase):
         tower = FishOmniAudioDecoder(cfg)
         codec = build_ae()
         model = Drama3Model(cfg, backbone, tower, codec, tokenizer)
+        mx.eval(model.parameters())
+        mx.synchronize()
         set_server_model(model)
         self.client = TestClient(app)
 

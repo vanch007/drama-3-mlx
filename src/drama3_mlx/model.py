@@ -135,6 +135,9 @@ class Drama3Model(nn.Module):
 
     def decode_codes_to_audio(self, codes: mx.array) -> np.ndarray:
         """Decode 10 codebooks [num_codebooks, num_frames] into 44.1kHz float32 audio."""
+        if codes.shape[-1] == 0:
+            return np.zeros((0,), dtype=np.float32)
+
         if codes.ndim == 2:
             codes_input = codes[None]
         else:

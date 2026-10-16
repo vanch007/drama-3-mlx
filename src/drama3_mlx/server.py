@@ -4,6 +4,7 @@ import io
 from typing import Any, List, Optional
 
 import numpy as np
+import mlx.core as mx
 import soundfile as sf
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
@@ -17,6 +18,8 @@ _model: Optional[Drama3Model] = None
 
 def set_server_model(model: Drama3Model) -> None:
     global _model
+    mx.eval(model.parameters())
+    mx.synchronize()
     _model = model
 
 
@@ -58,10 +61,12 @@ def health() -> dict[str, Any]:
 
 @app.post("/v1/audio/speech")
 async def openai_speech(req: OpenAISpeechRequest):
+    mx.set_default_device(mx.gpu)
     model = get_server_model()
 
     if req.stream:
         async def stream_generator():
+            mx.set_default_device(mx.gpu)
             for chunk in model.tts_stream(req.input):
                 # Convert float32 array to 16-bit PCM bytes
                 pcm16 = (chunk * 32767).clip(-32768, 32767).astype(np.int16).tobytes()
@@ -79,6 +84,7 @@ async def openai_speech(req: OpenAISpeechRequest):
 
 @app.post("/v1/tts")
 async def fish_tts(req: FishTTSRequest):
+    mx.set_default_device(mx.gpu)
     model = get_server_model()
 
     ref_audio = None

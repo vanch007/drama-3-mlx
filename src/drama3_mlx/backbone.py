@@ -63,6 +63,7 @@ class FishOmniBackbone(nn.Module):
         angles = mx.concatenate([angles, angles], axis=-1)
         self._cos_table = mx.cos(angles)
         self._sin_table = mx.sin(angles)
+        mx.eval(self._cos_table, self._sin_table)
 
     def allocate_caches(self, batch_size: int, max_seq_len: int) -> None:
         for layer in self.layers:
